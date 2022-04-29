@@ -12,15 +12,23 @@ const Display = ({ text, value }) => (
 
 const Statistics = ({ good, bad, neutral }) => {
   const all = good + neutral + bad;
+  if (all) {
+    return (
+      <div>
+        <h2>statistics</h2>
+        <Display text={'good'} value={good} />
+        <Display text={'neutral'} value={neutral} />
+        <Display text={'bad'} value={bad} />
+        <Display text={'all'} value={all} />
+        <Display text={'average'} value={(good - bad) / all} />
+        <Display text={'positive'} value={`${(good / all) * 100} %`} />
+      </div>
+    );
+  }
   return (
     <div>
       <h2>statistics</h2>
-      <Display text={'good'} value={good} />
-      <Display text={'neutral'} value={neutral} />
-      <Display text={'bad'} value={bad} />
-      <Display text={'all'} value={all} />
-      <Display text={'average'} value={(good - bad) / all} />
-      <Display text={'positive'} value={`${(good / all) * 100} %`} />
+      <p>No feedback given</p>
     </div>
   );
 };
