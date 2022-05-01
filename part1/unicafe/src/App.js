@@ -4,7 +4,7 @@ const Button = ({ handleClick, text }) => (
   <button onClick={handleClick}>{text}</button>
 );
 
-const Display = ({ text, value }) => (
+const StatisticLine = ({ text, value }) => (
   <p>
     {text} {value}
   </p>
@@ -16,12 +16,12 @@ const Statistics = ({ good, bad, neutral }) => {
     return (
       <div>
         <h2>statistics</h2>
-        <Display text={'good'} value={good} />
-        <Display text={'neutral'} value={neutral} />
-        <Display text={'bad'} value={bad} />
-        <Display text={'all'} value={all} />
-        <Display text={'average'} value={(good - bad) / all} />
-        <Display text={'positive'} value={`${(good / all) * 100} %`} />
+        <StatisticLine text={'good'} value={good} />
+        <StatisticLine text={'neutral'} value={neutral} />
+        <StatisticLine text={'bad'} value={bad} />
+        <StatisticLine text={'all'} value={all} />
+        <StatisticLine text={'average'} value={(good - bad) / all} />
+        <StatisticLine text={'positive'} value={`${(good / all) * 100} %`} />
       </div>
     );
   }
