@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import Filter from './components/Filter';
+import PersonForm from './components/PersonForm';
+import Persons from './components/Persons';
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -11,6 +14,9 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [newFilter, setNewFilter] = useState('');
 
+  const changeFilter = (e) => setNewFilter(e.target.value);
+  const changeName = (e) => setNewName(e.target.value);
+  const changeNumber = (e) => setNewNumber(e.target.value);
   const addNewPerson = (e) => {
     e.preventDefault();
     const personObject = {
@@ -35,44 +41,17 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with{' '}
-        <input
-          value={newFilter}
-          onChange={(e) => setNewFilter(e.target.value)}
-        />
-      </div>
-      <h2>add a new</h2>
-      <form>
-        <div>
-          name:{' '}
-          <input value={newName} onChange={(e) => setNewName(e.target.value)} />
-        </div>
-        <div>
-          number:{' '}
-          <input
-            value={newNumber}
-            onChange={(e) => setNewNumber(e.target.value)}
-          />
-        </div>
-        <div>
-          <button type="submit" onClick={addNewPerson}>
-            add
-          </button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      <div>
-        {persons
-          .filter((person) =>
-            person.name.toLowerCase().includes(newFilter.toLocaleLowerCase())
-          )
-          .map((person) => (
-            <p key={person.id}>
-              {person.name} {person.number}
-            </p>
-          ))}
-      </div>
+      <Filter newFilter={newFilter} changeFilter={changeFilter} />
+      <h3>add a new</h3>
+      <PersonForm
+        newName={newName}
+        changeName={changeName}
+        newNumber={newNumber}
+        changeNumber={changeNumber}
+        addNewPerson={addNewPerson}
+      />
+      <h3>Numbers</h3>
+      <Persons persons={persons} newFilter={newFilter} />
     </div>
   );
 };
