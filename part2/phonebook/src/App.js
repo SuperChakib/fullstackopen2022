@@ -13,9 +13,15 @@ const App = () => {
 
   const addNewPerson = (e) => {
     e.preventDefault();
-    const personObject = { name: newName, number: newNumber };
-    const dummyArray = [...persons].map((person) => JSON.stringify(person));
-    if (dummyArray.includes(JSON.stringify(personObject))) {
+    const personObject = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    };
+    const dummyArray = [...persons].map(
+      (person) => person.name + person.number
+    );
+    if (dummyArray.includes(personObject.name + personObject.number)) {
       alert(`${newName} is already added to phonebook`);
       setNewName('');
       setNewNumber('');
@@ -62,7 +68,7 @@ const App = () => {
             person.name.toLowerCase().includes(newFilter.toLocaleLowerCase())
           )
           .map((person) => (
-            <p key={person.name + person.number}>
+            <p key={person.id}>
               {person.name} {person.number}
             </p>
           ))}
