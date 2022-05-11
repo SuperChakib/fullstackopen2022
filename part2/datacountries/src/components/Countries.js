@@ -1,13 +1,4 @@
-const SingleCountry = ({ country }) => (
-    <div>
-      <h2>{country.name.common}</h2>
-      <p>capital {country.capital}</p>
-      <p>area {country.area}</p>
-      <h3>languages:</h3>
-      <ul>{Object.values(country.languages).map(language => <li key={language}>{language}</li>)}</ul>
-      <img src={country.flags.svg} alt={'country flag'} width={150} height={100} />
-    </div>
-  )
+import SingleCountry from "./SinleCountry"
 
 const Countries = ({ filteredCountries, setFilteredCountries }) => {
   if (filteredCountries.length > 10 && filteredCountries.length < 250)
