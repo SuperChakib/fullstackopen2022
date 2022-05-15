@@ -1,12 +1,12 @@
 import React from 'react';
 
-const Person = ({ name, number }) => (
+const Person = ({ name, number, removePerson }) => (
   <p>
-    {name} {number}
+    {name} {number} <button onClick={removePerson}>delete</button>
   </p>
 );
 
-const Persons = ({ persons, newFilter }) => {
+const Persons = ({ persons, newFilter, removePerson }) => {
   return (
     <div>
       {persons
@@ -14,7 +14,7 @@ const Persons = ({ persons, newFilter }) => {
           person.name.toLowerCase().includes(newFilter.toLowerCase())
         )
         .map((person) => (
-          <Person key={person.id} name={person.name} number={person.number} />
+          <Person key={person.id} name={person.name} number={person.number} removePerson={() => removePerson(person.id)} />
         ))}
     </div>
   );
