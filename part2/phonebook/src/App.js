@@ -11,6 +11,7 @@ const App = () => {
       .get('http://localhost:3001/persons')
       .then(response => setPersons(response.data))
   }, [])
+  
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [newFilter, setNewFilter] = useState('');
@@ -18,6 +19,7 @@ const App = () => {
   const changeFilter = (e) => setNewFilter(e.target.value);
   const changeName = (e) => setNewName(e.target.value);
   const changeNumber = (e) => setNewNumber(e.target.value);
+
   const addNewPerson = (e) => {
     e.preventDefault();
     const personObject = {
@@ -34,9 +36,13 @@ const App = () => {
       setNewNumber('');
       return;
     }
-    setPersons(persons.concat(personObject));
-    setNewName('');
-    setNewNumber('');
+    axios
+      .post('http://localhost:3001/persons', personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data));
+        setNewName('');
+        setNewNumber('');
+      })
   };
 
   return (
