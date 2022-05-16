@@ -22,36 +22,39 @@ const App = () => {
 
   const addNewPerson = (e) => {
     e.preventDefault();
-    const personObject = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
-    };
-    const dummyArray = [...persons].map(
-      (person) => person.name + person.number
-    );
-    if (dummyArray.includes(personObject.name + personObject.number)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName('');
-      setNewNumber('');
-      return;
+    const dummyArray = persons.map(person => person.name + person.number);
+    const newNumberPerson = persons.find(p => p.name === newName);
+    if (dummyArray.includes(newName + newNumber)) alert(`${newName} is already added to phonebook with that number.`);
+    else if (newNumberPerson) {
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(newNumberPerson.id, {...newNumberPerson, number: newNumber})
+          .then(returnedPerson => setPersons(persons.map(person => person.id !== newNumberPerson.id ? person : returnedPerson)))
+      }
     }
-    personService
-      .create(personObject)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson));
-        setNewName('');
-        setNewNumber('');
-      })
+    else {
+      const personObject = {
+        name: newName,
+        number: newNumber,
+        id: persons.length + 1,
+      };
+      personService
+        .create(personObject)
+        .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
+    }
+    setNewName('');
+    setNewNumber('');
   };
 
   const removePerson = id => {
     if(window.confirm(`Delete ${persons.find(p => p.id === id).name} ?`)) {
       personService
-      .remove(id)
-      setPersons(persons.filter(person => person.id !== id))
-      setNewName('');
-      setNewNumber('');
+        .remove(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id));
+          setNewName('');
+          setNewNumber('');
+        })
     }
   }
 
