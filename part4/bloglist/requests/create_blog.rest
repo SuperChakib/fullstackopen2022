@@ -1,0 +1,19 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "queenZ",
+  "author": "Lolita",
+  "url": "lolita.com",
+  "likes": 56003
+}
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Octopath",
+  "author": "Traveler",
+  "url": "octy.com",
+  "likes": 23423
+}
