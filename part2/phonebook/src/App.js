@@ -36,9 +36,14 @@ const App = () => {
             setPersons(persons.map(person => person.id !== newNumberPerson.id ? person : returnedPerson))
             setSuccessMessage(`Updated ${returnedPerson.name}`)
           })
-          .catch(() => {
-            setErrorMessage(`Information of ${newName} has already been removed from server`)
-            setPersons(persons.filter(p => p.name !== newName))
+          .catch((error) => {
+            console.log(error.name);
+            if (error.name === 'TypeError') {
+              setErrorMessage(`Information of ${newName} has already been removed from server`)
+              setPersons(persons.filter(p => p.name !== newName))
+            } else {
+              setErrorMessage(error.response.data.error)
+            }
           })
       }
     }
@@ -53,6 +58,9 @@ const App = () => {
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           setSuccessMessage(`Added ${returnedPerson.name}`)
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data.error)
         })
     }
     setTimeout(() => setSuccessMessage(null), 5000)
