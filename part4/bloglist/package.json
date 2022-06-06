@@ -4,15 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "jest --verbose"
   },
   "author": "Chakib",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^8.17.0",
+    "jest": "^28.1.0",
     "nodemon": "^2.0.16"
   },
   "dependencies": {
