@@ -28,3 +28,24 @@ test('getting all blogs returns correct amount and format', async () => {
   expect(response.body).toHaveLength(helper.initialBlogs.length)
   response.body.forEach(blog => expect(blog.id).toBeDefined())
 })
+
+test('a blog post is created after a POST', async () => {
+  const newBlog ={
+    title: 'salameche',
+    author: 'chakib',
+    url: 'salameche.chakib.com',
+    likes: 334
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+
+  const contents = blogsAtEnd.map(blog => blog.url)
+  expect(contents).toContain('salameche.chakib.com')
+})
