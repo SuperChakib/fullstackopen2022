@@ -26,4 +26,5 @@ test('getting all blogs returns correct amount and format', async () => {
     .expect('Content-Type', /application\/json/)
 
   expect(response.body).toHaveLength(helper.initialBlogs.length)
+  response.body.forEach(blog => expect(blog.id).toBeDefined())
 })
