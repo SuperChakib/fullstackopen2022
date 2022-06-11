@@ -115,9 +115,105 @@ describe('deletion of a blog', () => {
     const blogsAtEnd = await helper.blogsInDb()
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
 
-    const contents = blogsAtEnd.map(r => {
-      return { title: r.title, url: r.url }
-    })
-    expect(contents).not.toContainEqual({ title: blogToDelete.title, url: blogToDelete.url })
+    if (blogToDelete.title) {
+      const titles = blogsAtEnd.map(r => r.title)
+      expect(titles).not.toContainEqual(blogToDelete.title)
+    } else if (blogToDelete.url) {
+      const urls = blogsAtEnd.map(r => r.url)
+      expect(urls).not.toContainEqual(blogToDelete.url)
+    }
+  })
+
+  test('succeeds with statuscode 204 even if blog already deleted', async () => {
+    const validNonExistingId = await helper.nonExistingValidId()
+
+    await api
+      .delete(`/api/blogs/${validNonExistingId}`)
+      .expect(204)
+  })
+
+  test('fails with statuscode 400 if malformatted id', async () => {
+    const invalidId = 1
+    await api
+      .delete(`/api/blogs/${invalidId}`)
+      .expect(400)
+  })
+})
+
+describe('updating a blog', () => {
+  test('succeeds with statuscode 200', async () => {
+    const updateInfo = {
+      likes: 1234
+    }
+
+    const blogsAtStart = await helper.blogsInDb()
+    const idToUpdate = blogsAtStart[0].id
+
+    await api
+      .put(`/api/blogs/${idToUpdate}`)
+      .send(updateInfo)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('only updates the likes',  async () => {
+    const updateInfo = {
+      title: 'Marvel',
+      author: 'Jupiter',
+      url: 'm.jupiter.com',
+      likes: 1234
+    }
+
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(updateInfo)
+
+    expect(response.body).toEqual({ ...blogToUpdate, likes: updateInfo.likes })
+  })
+
+  test('doesn\'t change the likes if property not precised', async () => {
+    const updateInfo = {
+      title: 'Marvel',
+      author: 'Jupiter',
+      url: 'm.jupiter.com'
+    }
+
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(updateInfo)
+
+    expect(response.body.likes).toBe(blogToUpdate.likes)
+  })
+})
+
+describe('viewing a specific blog', () => {
+  test('succeeds with a valid id', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToView = blogsAtStart[0]
+
+    const response = await api
+      .get(`/api/blogs/${blogToView.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body).toEqual(blogToView)
+  })
+
+  test('fails with statuscode 404 if id of deleted blog', async () => {
+    const nonExistingValidId = await helper.nonExistingValidId()
+
+    await api
+      .get(`/api/blogs/${nonExistingValidId}`)
+      .expect(404)
+  })
+
+  test('fails with statuscode 400 if malformatted id', async () => {
+    const invalidId = 1
+
+    await api
+      .get(`/api/blogs/${invalidId}`)
+      .expect(400)
   })
 })

@@ -6,14 +6,12 @@ const initialBlogs = [
     author: 'Lolita',
     url: 'lolita.com',
     likes: 56003,
-    id: '629cac47b278993d925b9f5a'
   },
   {
     title: 'Octopath',
     author: 'Traveler',
     url: 'octy.com',
     likes: 23423,
-    id: '629cd6345e5a348601cb6743'
   }
 ]
 
@@ -22,6 +20,18 @@ const blogsInDb = async () => {
   return blogs.map(blog => blog.toJSON())
 }
 
+const nonExistingValidId = async () => {
+  const blog = new Blog({
+    title: 'test',
+    url: 'test.com'
+  })
+
+  await blog.save()
+  await blog.remove()
+
+  return blog._id.toString()
+}
+
 module.exports = {
-  initialBlogs, blogsInDb
+  initialBlogs, blogsInDb, nonExistingValidId
 }

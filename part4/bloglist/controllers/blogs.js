@@ -8,7 +8,9 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.get('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
-  response.json(blog)
+  blog
+    ? response.json(blog)
+    : response.status(404).end()
 })
 
 blogRouter.delete('/:id', async (request, response) => {
@@ -29,11 +31,14 @@ blogRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogRouter.put('/', async (request, response) => {
+blogRouter.put('/:id', async (request, response) => {
+  const likes = request.body.likes
+
   const modifiedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    request.body,
+    likes ? { likes } : {},
     { new: true, runValidators: true, context: 'query' })
+
   response.json(modifiedBlog)
 })
 
