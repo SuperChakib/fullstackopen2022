@@ -49,3 +49,34 @@ test('a blog post is created after a POST', async () => {
   const contents = blogsAtEnd.map(blog => blog.url)
   expect(contents).toContain('salameche.chakib.com')
 })
+
+test('when posting, if likes missing, default to 0', async () => {
+  const newBlog ={
+    title: 'salameche',
+    author: 'chakib',
+    url: 'salameche.chakib.com'
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.likes).toBe(0)
+})
+
+test('when posting, if title and url are missing, 400 Bad request', async () => {
+  const newBlog ={
+    author: 'chakib',
+    likes: 334
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+})
