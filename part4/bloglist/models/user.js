@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    minLength: [ 4, 'username must be at least 4 characters long, got {VALUE}' ],
+    required: true,
+    minLength: [ 3, 'username must be at least 3 characters long, got {VALUE}' ],
     validator: {
       validate: function (v) {
         return /^\w*$/.test(v)
@@ -12,7 +13,10 @@ const userSchema = new mongoose.Schema({
     }
   },
   name: String,
-  passwordHash: String,
+  passwordHash: {
+    type: String,
+    required: true
+  },
   notes: [
     {
       type: mongoose.Schema.Types.ObjectId,

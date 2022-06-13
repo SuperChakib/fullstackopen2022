@@ -10,14 +10,15 @@ userRouter.get('/', async (request, response) => {
 userRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
 
-  const existingUser = await User.findOne({ username })
-
-  if (existingUser) {
-    return response.status(400).json({ error: 'username already taken' })
+  //main validation done here to save superfluous actions and time
+  if (!username || !password) {
+    return response.status(400).json({ error: 'username and password must be provided' })
   }
-
-  const passwordError = !/(?=.{8,})/.test(password)
-    ? 'password must contain at least 8 characters long'
+  if (username.length < 3) {
+    return response.status(400).json({ error: `username must be at least 3 characters long, got ${username.length}` })
+  }
+  const passwordError = !/(?=.{3,})/.test(password)
+    ? `password must be at least 3 characters long, got ${password.length}`
     : !/(?=.*[A-Z])/.test(password)
       ? 'password must contain at least one uppercase character'
       : !/(?=.*[a-z])/.test(password)
@@ -27,9 +28,12 @@ userRouter.post('/', async (request, response) => {
           : !/(?=.*[^A-Za-z0-9])/.test(password)
             ? 'password must contain at least one special character'
             : ''
-
   if (passwordError) {
     return response.status(400).json({ error: passwordError })
+  }
+  const existingUser = await User.findOne({ username })
+  if (existingUser) {
+    return response.status(400).json({ error: 'username must be unique' })
   }
 
   const saltRounds = 10
@@ -40,9 +44,7 @@ userRouter.post('/', async (request, response) => {
     name,
     passwordHash
   })
-
   const savedUser = await newUser.save()
-
   response.status(201).json(savedUser)
 })
 
