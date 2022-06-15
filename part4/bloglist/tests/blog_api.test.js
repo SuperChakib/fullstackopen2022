@@ -118,7 +118,8 @@ describe('deletion of a blog', () => {
     if (blogToDelete.title) {
       const titles = blogsAtEnd.map(r => r.title)
       expect(titles).not.toContainEqual(blogToDelete.title)
-    } else if (blogToDelete.url) {
+    }
+    if (blogToDelete.url) {
       const urls = blogsAtEnd.map(r => r.url)
       expect(urls).not.toContainEqual(blogToDelete.url)
     }

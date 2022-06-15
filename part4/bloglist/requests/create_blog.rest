@@ -8,6 +8,7 @@ Content-Type: application/json
   "likes": 56003
 }
 ###
+
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
@@ -16,4 +17,15 @@ Content-Type: application/json
   "author": "Traveler",
   "url": "octy.com",
   "likes": 23423
+}
+###
+
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Chakib Super Author",
+  "author": "Chakib",
+  "url": "chakibou.com",
+  "likes": 764
 }
