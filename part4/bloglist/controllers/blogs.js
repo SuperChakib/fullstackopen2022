@@ -15,25 +15,36 @@ blogRouter.get('/:id', async (request, response) => {
 })
 
 blogRouter.delete('/:id', userExtractor, async (request, response) => {
+  if (!request.token) {
+    return response.status(401).json({ error: 'token is missing' })
+  }
+
   const blog = await Blog.findById(request.params.id)
 
+  if (!blog) {
+    return response.status(204).end()
+  }
+
   const user = request.user
-  if (blog && user && user.id.toString() === blog.user.toString()) {
+  if (user && user.toJSON().id === blog.user.toString()) {
     await blog.remove()
     response.status(204).end()
   } else {
-    response.status(401).json({ error: 'missing or invalid token (maybe different user)' })
+    response.status(401).json({ error: 'token is invalid' })
   }
-
 })
 
 blogRouter.post('/', userExtractor, async (request, response) => {
   const body = request.body
   if (!body.title && !body.url) return response.status(400).end()
 
+  if (!request.token) {
+    return response.status(401).json({ error: 'token is missing' })
+  }
+
   const user = request.user
   if (!user) {
-    return response.status(401).json({ error: 'token missing or invalid' })
+    return response.status(401).json({ error: 'token is invalid' })
   }
 
   const blog = body.likes

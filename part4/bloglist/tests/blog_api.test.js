@@ -2,16 +2,47 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
+
+let token
+
+beforeAll(async () => {
+  await User.deleteMany({})
+
+  const user = {
+    username: 'root',
+    name: 'root',
+    password: 'Sala1ne!'
+  }
+  await api
+    .post('/api/users')
+    .send(user)
+
+  const savedUser = await User.findOne({ username: user.username })
+
+  const userForToken = {
+    username: savedUser.username,
+    id: savedUser._id
+  }
+  token = jwt.sign(
+    userForToken,
+    process.env.SECRET,
+    { expiresIn: 60 }
+  )
+})
 
 beforeEach(async () => {
   await Blog.deleteMany({})
 
   for(let blog of helper.initialBlogs) {
-    let blogObject = new Blog(blog)
-    await blogObject.save()
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(blog)
   }
 })
 
@@ -58,6 +89,7 @@ describe('adding a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -80,6 +112,7 @@ describe('adding a new blog', () => {
 
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -95,11 +128,28 @@ describe('adding a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
 
     const blogsAtEnd = await helper.blogsInDb()
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+  })
+
+  test('fails with error 401 Unauthorized if token is not provided', async () => {
+    const newBlog ={
+      title: 'salameche',
+      author: 'chakib',
+      url: 'salameche.chakib.com',
+      likes: 334
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+
+    expect(response.body.error).toBe('invalid token')
   })
 })
 
@@ -110,6 +160,7 @@ describe('deletion of a blog', () => {
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -130,14 +181,18 @@ describe('deletion of a blog', () => {
 
     await api
       .delete(`/api/blogs/${validNonExistingId}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
   })
 
   test('fails with statuscode 400 if malformatted id', async () => {
     const invalidId = 1
-    await api
+    const response = await api
       .delete(`/api/blogs/${invalidId}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
+
+    expect(response.body.error).toBe('malformatted id')
   })
 })
 
@@ -166,7 +221,9 @@ describe('updating a blog', () => {
     }
 
     const blogsAtStart = await helper.blogsInDb()
-    const blogToUpdate = blogsAtStart[0]
+    let blogToUpdate = blogsAtStart[0]
+
+    blogToUpdate = JSON.parse(JSON.stringify(blogToUpdate))
 
     const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(updateInfo)
 
@@ -192,12 +249,14 @@ describe('updating a blog', () => {
 describe('viewing a specific blog', () => {
   test('succeeds with a valid id', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const blogToView = blogsAtStart[0]
+    let blogToView = blogsAtStart[0]
 
     const response = await api
       .get(`/api/blogs/${blogToView.id}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
+
+    blogToView = JSON.parse(JSON.stringify(blogToView))
 
     expect(response.body).toEqual(blogToView)
   })
