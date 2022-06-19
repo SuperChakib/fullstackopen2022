@@ -42,8 +42,8 @@ describe('saving a user', () => {
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
-    expect(response.body.username).toEqual(newUser.username)
-    expect(response.body.name).toEqual(newUser.name)
+    expect(response.body.username).toBe(newUser.username)
+    expect(response.body.name).toBe(newUser.name)
   })
 
   test('fails with proper statuscode and message if username missing', async () => {

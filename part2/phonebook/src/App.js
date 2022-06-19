@@ -23,46 +23,50 @@ const App = () => {
   const changeName = (e) => setNewName(e.target.value);
   const changeNumber = (e) => setNewNumber(e.target.value);
 
+  const updatePersonHelper = existingPerson => {
+    if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+      personService
+        .update(existingPerson.id, {...existingPerson, number: newNumber})
+        .then(updatedPerson => {
+          setPersons(persons.map(person => person.id !== existingPerson.id ? person : updatedPerson))
+          setSuccessMessage(`Updated ${updatedPerson.name}`)
+        })
+        .catch((error) => {
+          console.log(error.name);
+          if (error.name === 'TypeError') {
+            setErrorMessage(`Information of ${newName} has already been removed from server`)
+            setPersons(persons.filter(p => p.name !== newName))
+          } else {
+            setErrorMessage(error.response.data.error)
+          }
+        })
+    }
+  }
+  const createPersonHelper = () => {
+    const personObject = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    };
+    personService
+      .create(personObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setSuccessMessage(`Added ${returnedPerson.name}`)
+      })
+      .catch(error => {
+        setErrorMessage(error.response.data.error)
+      })
+  }
   const addNewPerson = (e) => {
     e.preventDefault();
+
     const dummyArray = persons.map(person => person.name + person.number);
-    const newNumberPerson = persons.find(p => p.name === newName);
+    const existingPerson = persons.find(p => p.name === newName);
     if (dummyArray.includes(newName + newNumber)) alert(`${newName} is already added to phonebook with that number.`);
-    else if (newNumberPerson) {
-      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        personService
-          .update(newNumberPerson.id, {...newNumberPerson, number: newNumber})
-          .then(returnedPerson => {
-            setPersons(persons.map(person => person.id !== newNumberPerson.id ? person : returnedPerson))
-            setSuccessMessage(`Updated ${returnedPerson.name}`)
-          })
-          .catch((error) => {
-            console.log(error.name);
-            if (error.name === 'TypeError') {
-              setErrorMessage(`Information of ${newName} has already been removed from server`)
-              setPersons(persons.filter(p => p.name !== newName))
-            } else {
-              setErrorMessage(error.response.data.error)
-            }
-          })
-      }
-    }
-    else {
-      const personObject = {
-        name: newName,
-        number: newNumber,
-        id: persons.length + 1,
-      };
-      personService
-        .create(personObject)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
-          setSuccessMessage(`Added ${returnedPerson.name}`)
-        })
-        .catch(error => {
-          setErrorMessage(error.response.data.error)
-        })
-    }
+    else if (existingPerson) updatePersonHelper(existingPerson)
+    else createPersonHelper()
+    
     setTimeout(() => setSuccessMessage(null), 5000)
     setTimeout(() => setErrorMessage(null), 5000)
     setNewName('');

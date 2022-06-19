@@ -43,6 +43,8 @@ beforeEach(async () => {
       .post('/api/blogs')
       .set('Authorization', `Bearer ${token}`)
       .send(blog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
   }
 })
 
@@ -168,11 +170,11 @@ describe('deletion of a blog', () => {
 
     if (blogToDelete.title) {
       const titles = blogsAtEnd.map(r => r.title)
-      expect(titles).not.toContainEqual(blogToDelete.title)
+      expect(titles).not.toContain(blogToDelete.title)
     }
     if (blogToDelete.url) {
       const urls = blogsAtEnd.map(r => r.url)
-      expect(urls).not.toContainEqual(blogToDelete.url)
+      expect(urls).not.toContain(blogToDelete.url)
     }
   })
 
@@ -205,11 +207,14 @@ describe('updating a blog', () => {
     const blogsAtStart = await helper.blogsInDb()
     const idToUpdate = blogsAtStart[0].id
 
-    await api
+    const response = await api
       .put(`/api/blogs/${idToUpdate}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updateInfo)
       .expect(200)
       .expect('Content-Type', /application\/json/)
+
+    expect(response.body.likes).toBe(updateInfo.likes)
   })
 
   test('only updates the likes',  async () => {
@@ -225,7 +230,10 @@ describe('updating a blog', () => {
 
     blogToUpdate = JSON.parse(JSON.stringify(blogToUpdate))
 
-    const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(updateInfo)
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updateInfo)
 
     expect(response.body).toEqual({ ...blogToUpdate, likes: updateInfo.likes })
   })
@@ -240,7 +248,10 @@ describe('updating a blog', () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToUpdate = blogsAtStart[0]
 
-    const response = await api.put(`/api/blogs/${blogToUpdate.id}`).send(updateInfo)
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updateInfo)
 
     expect(response.body.likes).toBe(blogToUpdate.likes)
   })

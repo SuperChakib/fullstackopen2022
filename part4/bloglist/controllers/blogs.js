@@ -15,10 +15,6 @@ blogRouter.get('/:id', async (request, response) => {
 })
 
 blogRouter.delete('/:id', userExtractor, async (request, response) => {
-  if (!request.token) {
-    return response.status(401).json({ error: 'token is missing' })
-  }
-
   const blog = await Blog.findById(request.params.id)
 
   if (!blog) {
@@ -38,10 +34,6 @@ blogRouter.post('/', userExtractor, async (request, response) => {
   const body = request.body
   if (!body.title && !body.url) return response.status(400).end()
 
-  if (!request.token) {
-    return response.status(401).json({ error: 'token is missing' })
-  }
-
   const user = request.user
   if (!user) {
     return response.status(401).json({ error: 'token is invalid' })
@@ -60,15 +52,24 @@ blogRouter.post('/', userExtractor, async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogRouter.put('/:id', async (request, response) => {
-  const likes = request.body.likes
+blogRouter.put('/:id', userExtractor, async (request, response) => {
+  const blogToModify = await Blog.findById(request.params.id)
+  const user = request.user
 
-  const modifiedBlog = await Blog.findByIdAndUpdate(
-    request.params.id,
-    likes ? { likes } : {},
-    { new: true, runValidators: true, context: 'query' })
+  if (user && user.toJSON().id === blogToModify.user.toString()) {
+    const likes = request.body.likes
 
-  response.json(modifiedBlog)
+    const modifiedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      likes ? { likes } : {},
+      { new: true, runValidators: true, context: 'query' })
+
+    response.json(modifiedBlog)
+  }
+  else {
+    response.status(401).json({ error: 'token is invalid' })
+  }
+
 })
 
 module.exports = blogRouter
