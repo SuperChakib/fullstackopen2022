@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
-import NoteForm from './components/NoteForm'
+import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
@@ -63,11 +63,11 @@ const App = () => {
     }, 5000);
   }
 
-  const noteFormRef = useRef()
+  const blogFormRef = useRef()
 
   const addBlog = async (newBlog) => {
     try {
-      noteFormRef.current.toggleVisibility()
+      blogFormRef.current.toggleVisibility()
       const savedBlog = await blogService.create(newBlog)
       setBlogs(blogs.concat(savedBlog))
       setSuccessMessage(`a new blog '${savedBlog.title}' by '${savedBlog.author}' added`)
@@ -88,8 +88,8 @@ const App = () => {
         <h2>blogs</h2>
         <Notification errorMessage={errorMessage} successMessage={successMessage} />
         <p>{user.username} logged-in <button onClick={handleLogout}>logout</button></p>
-        <Togglable buttonLabel='new note' ref={noteFormRef}>
-          <NoteForm createBlog={addBlog} />
+        <Togglable buttonLabel='new blog' ref={blogFormRef}>
+          <BlogForm createBlog={addBlog} />
         </Togglable>
         <br />
         {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
