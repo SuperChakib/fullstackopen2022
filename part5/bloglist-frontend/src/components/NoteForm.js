@@ -1,18 +1,42 @@
-const NoteForm = ({ title, setTitle, author, setAuthor, url, setUrl, addBlog }) => (
-  <form onSubmit={addBlog}>
+import { useState } from 'react'
+
+const NoteForm = ({ createBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const addBlog = e => {
+    e.preventDefault()
+    createBlog({ title, author, url})
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+  }
+
+  const handleText = ({ target }) => setTitle(target.value)
+  const handleAuthor = ({ target }) => setAuthor(target.value)
+  const handleUrl = ({ target }) => setUrl(target.value)
+
+  return (
     <div>
-      title:
-      <input type='text' value={title} onChange={({ target }) => setTitle(target.value)} name='title' />
+      <h2>create new</h2>
+      <form onSubmit={addBlog}>
+        <div>
+          title:
+          <input type='text' value={title} onChange={handleText} name='title' />
+        </div>
+        <div>
+          author:
+          <input type='text' value={author} onChange={handleAuthor} name='author' />
+        </div>
+        <div>
+          url:
+          <input type='text' value={url} onChange={handleUrl} name='url' />
+        </div>
+        <button>create</button>
+      </form>
     </div>
-    <div>
-      author:
-      <input type='text' value={author} onChange={({ target }) => setAuthor(target.value)} name='author' />
-    </div>
-    <div>
-      url:
-      <input type='text' value={url} onChange={({ target }) => setUrl(target.value)} name='url' />
-    </div>
-    <button>create</button>
-  </form>)
+  )
+}
 
 export default NoteForm

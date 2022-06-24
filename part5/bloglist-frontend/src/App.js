@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import NoteForm from './components/NoteForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -12,10 +13,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -31,6 +28,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -65,23 +63,19 @@ const App = () => {
     }, 5000);
   }
 
-  const addBlog = async e => {
-    e.preventDefault()
+  const noteFormRef = useRef()
+
+  const addBlog = async (newBlog) => {
     try {
-      const newBlog = {
-        title, author, url
-      }
+      noteFormRef.current.toggleVisibility()
       const savedBlog = await blogService.create(newBlog)
       setBlogs(blogs.concat(savedBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      setSuccessMessage(`a new blog '${title}' by '${author}' added`)
+      setSuccessMessage(`a new blog '${savedBlog.title}' by '${savedBlog.author}' added`)
       setTimeout(() => {
         setSuccessMessage('')
       }, 5000)
     } catch (exception) {
-      setErrorMessage('Both title and url are required')
+      setErrorMessage(exception.response.data.error)
       setTimeout(() => {
         setErrorMessage('')
       }, 5000)
@@ -94,15 +88,23 @@ const App = () => {
         <h2>blogs</h2>
         <Notification errorMessage={errorMessage} successMessage={successMessage} />
         <p>{user.username} logged-in <button onClick={handleLogout}>logout</button></p>
-        <h2>create new</h2>
-        <NoteForm title={title} setTitle={setTitle} author={author} setAuthor={setAuthor} url={url} setUrl={setUrl} addBlog={addBlog} />
+        <Togglable buttonLabel='new note' ref={noteFormRef}>
+          <NoteForm createBlog={addBlog} />
+        </Togglable>
+        <br />
         {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
       </div>)
     : (
       <div>
         <h2>log in to application</h2>
         <Notification errorMessage={errorMessage} successMessage={successMessage} />
-        <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} />
+        <LoginForm
+          username={username}
+          password={password}
+          setUsername={setUsername}
+          setPassword={setPassword}
+          handleLogin={handleLogin}
+        />
       </div>)
 }
 
