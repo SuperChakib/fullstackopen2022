@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 const Notification = ({ errorMessage, successMessage }) => {
   if (errorMessage) {
     const errorStyle = {
@@ -33,6 +35,11 @@ const Notification = ({ errorMessage, successMessage }) => {
       </div>
     )
   }
+}
+
+Notification.propTypes = {
+  errorMessage: PropTypes.string.isRequired,
+  successMessage: PropTypes.string.isRequired
 }
 
 export default Notification
