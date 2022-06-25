@@ -69,7 +69,7 @@ const App = () => {
     try {
       blogFormRef.current.toggleVisibility()
       const savedBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(savedBlog))
+      setBlogs(blogs.concat({ ...savedBlog, user: { username: user.username } }).sort((a, b) => b.likes - a.likes))
       setSuccessMessage(`a new blog '${savedBlog.title}' by '${savedBlog.author}' added`)
       setTimeout(() => {
         setSuccessMessage('')
@@ -95,7 +95,14 @@ const App = () => {
         </Togglable>
         <br />
         <button onClick={() => setShowAll(!showAll)}>{showAll ? 'Hide' : 'Show'} all</button>
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} show={showAll} />)}
+        {blogs.map(blog => <Blog
+          key={blog.id}
+          blog={blog}
+          blogs={blogs}
+          setBlogs={setBlogs}
+          show={showAll}
+          user={user}
+        />)}
       </div>)
     : (
       <div>
