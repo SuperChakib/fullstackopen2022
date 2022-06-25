@@ -17,18 +17,20 @@ const App = () => {
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
+  const [showAll, setShowAll] = useState(false)
+
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    blogService
+      .getAll()
+      .then(blogs => setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
   }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
       blogService.setToken(user.token)
+      setUser(user)
     }
   }, [])
 
@@ -63,8 +65,6 @@ const App = () => {
     }, 5000);
   }
 
-  const blogFormRef = useRef()
-
   const addBlog = async (newBlog) => {
     try {
       blogFormRef.current.toggleVisibility()
@@ -82,17 +82,20 @@ const App = () => {
     }
   }
 
+  const blogFormRef = useRef()
+
   return user
     ? (
       <div>
         <h2>blogs</h2>
         <Notification errorMessage={errorMessage} successMessage={successMessage} />
         <p>{user.username} logged-in <button onClick={handleLogout}>logout</button></p>
-        <Togglable buttonLabel='new blog' ref={blogFormRef}>
+        <Togglable buttonLabel='create new blog' ref={blogFormRef}>
           <BlogForm createBlog={addBlog} />
         </Togglable>
         <br />
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+        <button onClick={() => setShowAll(!showAll)}>{showAll ? 'Hide' : 'Show'} all</button>
+        {blogs.map(blog => <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} show={showAll} />)}
       </div>)
     : (
       <div>

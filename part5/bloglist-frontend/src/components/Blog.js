@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, blogs, setBlogs, show }) => {
   const blogStyle = {
     borderWidth: 1,
     border: 'solid',
@@ -10,22 +10,27 @@ const Blog = ({ blog }) => {
     paddingLeft: 2
   }
 
-  const [visible, setVisible] = useState(false)
-  const [likes, setLikes] = useState(blog.likes)
+  const [visible, setVisible] = useState(show)
+
+  useEffect(() => {
+    setVisible(show)
+  }, [show])
 
   const toggleVisibility = () => setVisible(!visible)
 
   const incrementLikes = async () => {
     const incrementedBlog = {
       user: blog.user.id,
-      likes: likes + 1,
+      likes: blog.likes + 1,
       author: blog.author,
       title: blog.title,
       url: blog.url
     }
 
-    const updatedBlog = await blogService.updateBlog(blog.id, incrementedBlog)
-    setLikes(updatedBlog.likes)
+    let updatedBlog = await blogService.updateBlog(blog.id, incrementedBlog)
+    setBlogs(blogs
+      .map(blog => blog.id !== updatedBlog.id ? blog : { ...blog, likes: updatedBlog.likes })
+      .sort((a, b) => b.likes - a.likes))
   }
 
   return (
@@ -34,7 +39,7 @@ const Blog = ({ blog }) => {
       <div style={{ display: visible ? '' : 'none' }}>
         {blog.url}
         <br />
-        likes {likes} <button onClick={(incrementLikes)}>likes</button>
+        likes {blog.likes} <button onClick={(incrementLikes)}>likes</button>
         <br />
         {blog.user.username}
       </div>
