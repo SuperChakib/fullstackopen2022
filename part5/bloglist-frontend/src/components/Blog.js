@@ -43,15 +43,14 @@ const Blog = ({ blog, blogs, setBlogs, show, user }) => {
   const removeBlog = async () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       await blogService.deleteBlog(blog.id)
-      setBlogs(blogs
-        .filter(b => b.id !== blog.id)
-        .sort((a, b) => b.likes - a.likes))
+      setBlogs(blogs.filter(b => b.id !== blog.id))
     }
   }
 
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author} <button onClick={toggleVisibility}>{visible ? 'hide' : 'show'}</button>
+      
       <div style={{ display: visible ? '' : 'none' }}>
         {blog.url}
         <br />

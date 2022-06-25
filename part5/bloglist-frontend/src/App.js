@@ -10,8 +10,6 @@ import loginService from './services/login'
 const App = () => {
   const [blogs, setBlogs] = useState([])
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   const [successMessage, setSuccessMessage] = useState('')
@@ -34,15 +32,12 @@ const App = () => {
     }
   }, [])
 
-  const handleLogin = async e => {
-    e.preventDefault()
+  const handleLogin = async credentials => {
     try {
-      const user = await loginService.login({ username, password })
+      const user = await loginService.login(credentials)
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       setUser(user)
       blogService.setToken(user.token)
-      setUsername('')
-      setPassword('')
       setSuccessMessage('successfully logged in')
       setTimeout(() => {
         setSuccessMessage('')
@@ -84,16 +79,27 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  return user
+  return !user
     ? (
       <div>
-        <h2>blogs</h2>
+        <h2>log in to application</h2>
         <Notification errorMessage={errorMessage} successMessage={successMessage} />
+        <LoginForm createLogin={handleLogin} />
+      </div>)
+    : (
+      <div>
+        <h2>blogs</h2>
+
+        <Notification errorMessage={errorMessage} successMessage={successMessage} />
+
         <p>{user.username} logged-in <button onClick={handleLogout}>logout</button></p>
+        
         <Togglable buttonLabel='create new blog' ref={blogFormRef}>
           <BlogForm createBlog={addBlog} />
         </Togglable>
+
         <br />
+
         <button onClick={() => setShowAll(!showAll)}>{showAll ? 'Hide' : 'Show'} all</button>
         {blogs.map(blog => <Blog
           key={blog.id}
@@ -103,18 +109,6 @@ const App = () => {
           show={showAll}
           user={user}
         />)}
-      </div>)
-    : (
-      <div>
-        <h2>log in to application</h2>
-        <Notification errorMessage={errorMessage} successMessage={successMessage} />
-        <LoginForm
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />
       </div>)
 }
 
