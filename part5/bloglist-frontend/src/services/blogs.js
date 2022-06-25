@@ -20,6 +20,11 @@ const create = async blog => {
   return response.data
 }
 
-const toExport = { setToken, getAll, create }
+const updateBlog = async (id, newBlog) => {
+  const response = await axios.put(`${baseUrl}/${id}`, newBlog)
+  return response.data
+}
+
+const toExport = { setToken, getAll, create, updateBlog }
 
 export default toExport

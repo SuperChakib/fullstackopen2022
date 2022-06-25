@@ -9,6 +9,11 @@ router.get('/', async (request, response) => {
   response.json(notes)
 })
 
+router.get('/:id', async (request, response) => {
+  const note = await Blog.findById(request.params.id)
+  response.json(note)
+})
+
 router.post('/', async (request, response) => {
   if (!request.user) {
     return response.status(401).json({ error: 'token missing or invalid' })
