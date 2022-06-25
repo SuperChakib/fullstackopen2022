@@ -51,7 +51,7 @@ const Blog = ({ blog, blogs, setBlogs, show, user }) => {
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author} <button onClick={toggleVisibility}>{visible ? 'hide' : 'show'}</button>
-      
+
       <div style={{ display: visible ? '' : 'none' }}>
         {blog.url}
         <br />

@@ -57,7 +57,7 @@ const App = () => {
     setSuccessMessage('successfully logged out')
     setTimeout(() => {
       setSuccessMessage('')
-    }, 5000);
+    }, 5000)
   }
 
   const addBlog = async (newBlog) => {
@@ -93,7 +93,7 @@ const App = () => {
         <Notification errorMessage={errorMessage} successMessage={successMessage} />
 
         <p>{user.username} logged-in <button onClick={handleLogout}>logout</button></p>
-        
+
         <Togglable buttonLabel='create new blog' ref={blogFormRef}>
           <BlogForm createBlog={addBlog} />
         </Togglable>
