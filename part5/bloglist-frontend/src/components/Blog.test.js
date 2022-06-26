@@ -27,8 +27,8 @@ test('component renders blog\'s information', () => {
   const details = container.querySelector('.blogDetails')
 
   expect(div).not.toHaveStyle('display: none')
-  expect(div).toHaveTextContent('Crash')
-  expect(div).toHaveTextContent('Naughty Dog')
+  expect(div).toHaveTextContent(blog.title)
+  expect(div).toHaveTextContent(blog.author)
   expect(details).toHaveStyle('display: none')
 })
 
