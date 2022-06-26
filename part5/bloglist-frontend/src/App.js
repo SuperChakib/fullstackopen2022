@@ -77,6 +77,20 @@ const App = () => {
     }
   }
 
+  const incrementLikes = async (id, incrementedBlog) => {
+    let updatedBlog = await blogService.updateBlog(id, incrementedBlog)
+    setBlogs(blogs
+      .map(blog => blog.id !== updatedBlog.id ? blog : { ...blog, likes: updatedBlog.likes })
+      .sort((a, b) => b.likes - a.likes))
+  }
+
+  const removeBlog = async blog => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      await blogService.deleteBlog(blog.id)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+    }
+  }
+
   const blogFormRef = useRef()
 
   return !user
@@ -104,10 +118,10 @@ const App = () => {
         {blogs.map(blog => <Blog
           key={blog.id}
           blog={blog}
-          blogs={blogs}
-          setBlogs={setBlogs}
-          show={showAll}
+          incrementLikes={incrementLikes}
           user={user}
+          removeBlog={removeBlog}
+          show={showAll}
         />)}
       </div>)
 }

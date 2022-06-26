@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, blogs, setBlogs, show, user }) => {
+const Blog = ({ blog, incrementLikes, user, removeBlog, show }) => {
   const blogStyle = {
     borderWidth: 1,
     border: 'solid',
@@ -26,7 +25,7 @@ const Blog = ({ blog, blogs, setBlogs, show, user }) => {
 
   const toggleVisibility = () => setVisible(!visible)
 
-  const incrementLikes = async () => {
+  const addLikes = async () => {
     const incrementedBlog = {
       user: blog.user.id,
       likes: blog.likes + 1,
@@ -34,18 +33,7 @@ const Blog = ({ blog, blogs, setBlogs, show, user }) => {
       title: blog.title,
       url: blog.url
     }
-
-    let updatedBlog = await blogService.updateBlog(blog.id, incrementedBlog)
-    setBlogs(blogs
-      .map(blog => blog.id !== updatedBlog.id ? blog : { ...blog, likes: updatedBlog.likes })
-      .sort((a, b) => b.likes - a.likes))
-  }
-
-  const removeBlog = async () => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      await blogService.deleteBlog(blog.id)
-      setBlogs(blogs.filter(b => b.id !== blog.id))
-    }
+    incrementLikes(blog.id, incrementedBlog)
   }
 
   return (
@@ -57,11 +45,11 @@ const Blog = ({ blog, blogs, setBlogs, show, user }) => {
       <div className='blogDetails' style={{ display: visible ? '' : 'none' }}>
         {blog.url}
         <br />
-        likes {blog.likes} <button onClick={(incrementLikes)}>likes</button>
+        likes {blog.likes} <button onClick={addLikes}>likes</button>
         <br />
         {blog.user.username}
         <br />
-        <button onClick={removeBlog} style={removeStyle}>remove</button>
+        <button onClick={() => removeBlog(blog)} style={removeStyle}>remove</button>
       </div>
     </div>
   )
@@ -69,10 +57,10 @@ const Blog = ({ blog, blogs, setBlogs, show, user }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  blogs: PropTypes.array.isRequired,
-  setBlogs: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  incrementLikes: PropTypes.func.isRequired,
+  removeBlog: PropTypes.func.isRequired
 }
 
 export default Blog
