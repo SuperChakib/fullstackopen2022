@@ -50,9 +50,11 @@ const Blog = ({ blog, blogs, setBlogs, show, user }) => {
 
   return (
     <div style={blogStyle}>
-      {blog.title} {blog.author} <button onClick={toggleVisibility}>{visible ? 'hide' : 'show'}</button>
+      <div className='blogItem'>
+        {blog.title} {blog.author} <button onClick={toggleVisibility}>{visible ? 'hide' : 'show'}</button>
+      </div>
 
-      <div style={{ display: visible ? '' : 'none' }}>
+      <div className='blogDetails' style={{ display: visible ? '' : 'none' }}>
         {blog.url}
         <br />
         likes {blog.likes} <button onClick={(incrementLikes)}>likes</button>
