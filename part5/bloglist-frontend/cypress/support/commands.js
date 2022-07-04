@@ -1,4 +1,5 @@
 Cypress.Commands.add('login', ({ username, password }) => {
+  localStorage.clear()
   cy.request('POST', 'http://localhost:3003/api/login', { username, password })
     .then(response => {
       localStorage.setItem('loggedBlogappUser', JSON.stringify(response.body))

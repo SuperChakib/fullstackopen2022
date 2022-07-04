@@ -58,10 +58,11 @@ describe('Blog app', function () {
       beforeEach(function () {
         cy.createBlog({ title: 'first blog', author: 'Chakib', url: 'chakib.first-blog.com' })
         cy.createBlog({ title: 'second blog', author: 'Chakib', url: 'chakib.second-blog.com' })
-        cy.createBlog({ title: 'blog from different author', author: 'anonymous', url: 'anonymous.other-blog.com' })
+        cy.createBlog({ title: 'third blog', author: 'Chakib', url: 'chakib.third-blog.com' })
       })
+
       it('users can like a blog', function () {
-        cy.contains('blog from different author').as('blogHeader')
+        cy.contains('third blog').as('blogHeader')
 
         cy.get('@blogHeader')
           .find('button')
@@ -74,6 +75,39 @@ describe('Blog app', function () {
             .contains('button', 'likes')
             .click()
         }
+      })
+
+      it('users can delete own blogs', function () {
+        cy.contains('first blog').as('blogHeader')
+
+        cy.get('@blogHeader')
+          .find('button')
+          .click()
+
+        cy.get('@blogHeader')
+          .parent()
+          .contains('button', 'remove')
+          .click()
+
+        cy.get('html').should('not.contain', 'first blog')
+      })
+
+      it('users cannot delete other blogs', function () {
+        cy.request('POST', 'http://localhost:3003/api/users', { username: 'Matt', password: 'Sala1ne!' })
+        cy.login({ username: 'Matt', password: 'Sala1ne!' })
+
+        cy.contains('first blog').as('blogHeader')
+
+        cy.get('@blogHeader')
+          .find('button')
+          .click()
+
+        cy.get('@blogHeader')
+          .parent()
+          .contains('button', 'remove')
+          .should('have.css', 'display', 'none')
+
+        cy.get('html').should('contain', 'first blog')
       })
     })
   })
