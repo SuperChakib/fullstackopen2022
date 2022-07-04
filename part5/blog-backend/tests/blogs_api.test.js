@@ -8,6 +8,11 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+afterAll(async () => {
+  mongoose.connection.close()
+  await Blog.deleteMany({})
+})
+
 describe('when there are some blogs in database', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
@@ -172,8 +177,4 @@ describe('user creation', () => {
 
     expect(result.body.error).toContain('username must be unique')
   })
-})
-
-afterAll(() => {
-  mongoose.connection.close()
 })
