@@ -13,7 +13,7 @@ const Notification = ({ errorMessage, successMessage }) => {
       marginBottom: 10
     }
     return (
-      <div style={errorStyle}>
+      <div style={errorStyle} id='error'>
         {errorMessage}
       </div>
     )
@@ -30,7 +30,7 @@ const Notification = ({ errorMessage, successMessage }) => {
       marginBottom: 10
     }
     return (
-      <div style={successStyle}>
+      <div style={successStyle} id='success'>
         {successMessage}
       </div>
     )
