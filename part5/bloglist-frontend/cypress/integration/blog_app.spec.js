@@ -40,7 +40,7 @@ describe('Blog app', function () {
       cy.login({ username: 'Chakib', password: 'Sala1ne!' })
     })
 
-    it.only('A blog can be created', function () {
+    it('A blog can be created', function () {
       cy.contains('button', 'create new blog').click()
       cy.get('#title-input').type('first blog')
       cy.get('#author-input').type('Chakib')
@@ -52,6 +52,29 @@ describe('Blog app', function () {
         .and('contain', 'Chakib')
       cy.get('.blogDetails')
         .should('contain', 'chakib.first-blog.com')
+    })
+
+    describe('and multiple blogs saved', function () {
+      beforeEach(function () {
+        cy.createBlog({ title: 'first blog', author: 'Chakib', url: 'chakib.first-blog.com' })
+        cy.createBlog({ title: 'second blog', author: 'Chakib', url: 'chakib.second-blog.com' })
+        cy.createBlog({ title: 'blog from different author', author: 'anonymous', url: 'anonymous.other-blog.com' })
+      })
+      it('users can like a blog', function () {
+        cy.contains('blog from different author').as('blogHeader')
+
+        cy.get('@blogHeader')
+          .find('button')
+          .click()
+
+        for (let i = 0; i < 3; i++) {
+          cy.get('@blogHeader')
+            .parent()
+            .should('contain', `likes ${i}`)
+            .contains('button', 'likes')
+            .click()
+        }
+      })
     })
   })
 })
