@@ -29,6 +29,9 @@ const reducer = (state = initialState, action) => {
     const updatedAnecdote = { ...anecdoteToUpdate, votes: anecdoteToUpdate.votes + 1 }
     return state.map(anecdote => anecdote.id === id ? updatedAnecdote : anecdote)
   }
+  if (action.type === 'new_note') {
+    return [ ...state, action.payload ]
+  }
 
   return state
 }
@@ -36,6 +39,15 @@ const reducer = (state = initialState, action) => {
 export const incrementVote = id => ({
   type: 'increment',
   payload: { id }
+})
+
+export const addNewNote = content => ({
+  type: 'new_note',
+  payload: {
+    content,
+    id: getId(),
+    votes: 0
+  }
 })
 
 export default reducer
