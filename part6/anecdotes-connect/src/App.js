@@ -3,28 +3,30 @@ import AnecdoteList from './components/AnecdoteList'
 import Notification from './components/Notification'
 import Filter from './components/Filter'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
+
 import { useEffect } from 'react'
 
 import { initializeAnecdotes } from './reducers/anecdoteReducer'
 
-const App = () => {
-  const filter = useSelector(state => state.notification)
-  const dispatch = useDispatch()
-
+const App = props => {
   useEffect(() => {
-    dispatch(initializeAnecdotes())
-  }, [dispatch])
+    props.initializeAnecdotes()
+  }, [props])
   
   return (
     <div>
       <h2>Anecdotes</h2>
       <Filter />
-      {filter ? <Notification /> : null}
+      {props.filter ? <Notification /> : null}
       <AnecdoteList />
       <AnecdoteForm />
     </div>
   )
 }
 
-export default App
+const mapStateToProps = state => ({
+  notification: state.notification
+})
+
+export default connect(mapStateToProps, { initializeAnecdotes })(App)
