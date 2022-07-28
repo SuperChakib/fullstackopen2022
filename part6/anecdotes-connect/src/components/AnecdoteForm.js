@@ -7,6 +7,9 @@ const AnecdoteForm = props => {
   const handleSubmit = async e => {
     e.preventDefault()
     const content = e.target.anecdote.value
+
+    if (!content) return
+    
     e.target.anecdote.value = ''
 
     props.createAnecdote(content)

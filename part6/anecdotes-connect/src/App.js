@@ -18,7 +18,7 @@ const App = props => {
     <div>
       <h2>Anecdotes</h2>
       <Filter />
-      {props.filter ? <Notification /> : null}
+      {props.notification ? <Notification /> : null}
       <AnecdoteList />
       <AnecdoteForm />
     </div>
