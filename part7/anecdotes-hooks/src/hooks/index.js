@@ -1,16 +1,22 @@
 import { useState } from "react"
 
-export const useField = type => {
+const useField = type => {
   const [value, setvalue] = useState('')
 
   const onChange = e => {
     setvalue(e.target.value)
   }
 
+  const reset = () => setvalue('')
 
   return {
-    type,
-    value,
-    onChange
+    btnAttributes: {
+      type,
+      value,
+      onChange
+    },
+    reset
   }
 }
+
+export default useField

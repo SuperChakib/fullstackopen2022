@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, Routes, Route, useMatch, useNavigate } from 'react-router-dom'
-import { useField } from './hooks/index'
+import useField from './hooks/index'
 
 const Menu = () => {
   const padding = {
@@ -17,7 +17,7 @@ const Menu = () => {
 
 const Anecdote = ({ anecdote, vote }) => (
   <div>
-    <h2>{anecdote.content}</h2>
+    <h2>{anecdote.content} by {anecdote.author}</h2>
     <p>has {anecdote.votes} votes</p>
     <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
     <button onClick={() => vote(anecdote.id)}>vote</button>
@@ -70,11 +70,17 @@ const CreateNew = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content: content.value,
-      author: author.value,
-      info: info.value,
+      content: content.btnAttributes.value,
+      author: author.btnAttributes.value,
+      info: info.btnAttributes.value,
       votes: 0
     })
+  }
+
+  const resetAll = e => {
+    content.reset()
+    author.reset()
+    info.reset()
   }
 
   return (
@@ -83,18 +89,19 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input {...content.btnAttributes} />
         </div>
         <div>
           author
-          <input {...author} />
+          <input {...author.btnAttributes} />
         </div>
         <div>
           url for more info
-          <input {...info} />
+          <input {...info.btnAttributes} />
         </div>
         <button>create</button>
       </form>
+      <button onClick={resetAll}>reset</button>
     </div>
   )
 
