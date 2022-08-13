@@ -61,7 +61,7 @@ const Footer = () => (
   </div>
 )
 
-const CreateNew = (props) => {
+const CreateNew = ({ addNew }) => {
   const content = useField('text')
   const author = useField('text')
   const info = useField('text')
@@ -69,7 +69,7 @@ const CreateNew = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    props.addNew({
+    addNew({
       content: content.btnAttributes.value,
       author: author.btnAttributes.value,
       info: info.btnAttributes.value,
@@ -77,7 +77,7 @@ const CreateNew = (props) => {
     })
   }
 
-  const resetAll = e => {
+  const resetAll = () => {
     content.reset()
     author.reset()
     info.reset()
@@ -139,8 +139,10 @@ const App = () => {
     setTimeout(() => setNotification(''), 5000)
   }
 
-  const anecdoteById = (id) =>
+  const anecdoteById = (id) => {
     anecdotes.find(anecdote => anecdote.id === id)
+  }
+
 
   const vote = (id) => {
     const anecdote = anecdoteById(id)
