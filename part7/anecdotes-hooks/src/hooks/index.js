@@ -10,11 +10,9 @@ const useField = type => {
   const reset = () => setvalue('')
 
   return {
-    btnAttributes: {
-      type,
-      value,
-      onChange
-    },
+    type,
+    value,
+    onChange,
     reset
   }
 }
