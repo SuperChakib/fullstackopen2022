@@ -1,25 +1,32 @@
 import { useState, useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import { addNewBlog, fetchBlogs, getAllBlogs } from './reducers/blogsReducer'
+import {
+  addNotification,
+  removeNotification,
+} from './reducers/notificationReducer'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/user'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const dispatch = useDispatch()
+
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
   const blogFormRef = useRef()
-  const byLikes = (b1, b2) => (b2.likes > b1.likes ? 1 : -1)
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs.sort(byLikes)))
+    dispatch(fetchBlogs())
   }, [])
+
+  const blogs = useSelector(getAllBlogs)
 
   useEffect(() => {
     const userFromStorage = userService.getUser()
@@ -51,18 +58,11 @@ const App = () => {
   }
 
   const createBlog = (blog) => {
-    blogService
-      .create(blog)
-      .then((createdBlog) => {
-        notify(
-          `a new blog '${createdBlog.title}' by ${createdBlog.author} added`
-        )
-        setBlogs(blogs.concat(createdBlog))
-        blogFormRef.current.toggleVisibility()
-      })
-      .catch((error) => {
-        notify('creating a blog failed: ' + error.response.data.error, 'alert')
-      })
+    dispatch(addNewBlog(blog))
+    notify(`a new blog '${blog.title}' by ${blog.author} added`)
+    blogFormRef.current.toggleVisibility().catch((error) => {
+      notify('creating a blog failed: ' + error.response.data.error, 'alert')
+    })
   }
 
   const removeBlog = (id) => {
@@ -77,8 +77,8 @@ const App = () => {
     }
 
     blogService.remove(id).then(() => {
-      const updatedBlogs = blogs.filter((b) => b.id !== id).sort(byLikes)
-      setBlogs(updatedBlogs)
+      /* const updatedBlogs = blogs.filter((b) => b.id !== id).sort(byLikes)
+      setBlogs(updatedBlogs) */
     })
   }
 
@@ -92,24 +92,23 @@ const App = () => {
 
     blogService.update(liked.id, liked).then((updatedBlog) => {
       notify(`you liked '${updatedBlog.title}' by ${updatedBlog.author}`)
-      const updatedBlogs = blogs
-        .map((b) => (b.id === id ? updatedBlog : b))
-        .sort(byLikes)
-      setBlogs(updatedBlogs)
+      //const updatedBlogs = blogs.map((b) => (b.id === id ? updatedBlog : b))
+      //.sort(byLikes)
+      //setBlogs(updatedBlogs)
     })
   }
 
   const notify = (message, type = 'info') => {
-    setNotification({ message, type })
+    dispatch(addNotification({ message, type }))
     setTimeout(() => {
-      setNotification(null)
+      dispatch(removeNotification())
     }, 5000)
   }
 
   if (user === null) {
     return (
       <>
-        <Notification notification={notification} />
+        <Notification />
         <LoginForm onLogin={login} />
       </>
     )
@@ -119,7 +118,7 @@ const App = () => {
     <div>
       <h2>blogs</h2>
 
-      <Notification notification={notification} />
+      <Notification />
 
       <div>
         {user.name} logged in
