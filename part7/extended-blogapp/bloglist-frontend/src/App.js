@@ -6,13 +6,18 @@ import LoginForm from './components/LoginForm'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
-import { addNewBlog, fetchBlogs, getAllBlogs } from './reducers/blogsReducer'
+import {
+  addNewBlog,
+  deleteBlog,
+  fetchBlogs,
+  getAllBlogs,
+  incrementLikes,
+} from './reducers/blogsReducer'
 import {
   addNotification,
   removeNotification,
 } from './reducers/notificationReducer'
 
-import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/user'
 
@@ -58,11 +63,13 @@ const App = () => {
   }
 
   const createBlog = (blog) => {
-    dispatch(addNewBlog(blog))
-    notify(`a new blog '${blog.title}' by ${blog.author} added`)
-    blogFormRef.current.toggleVisibility().catch((error) => {
+    try {
+      dispatch(addNewBlog(blog))
+      notify(`a new blog '${blog.title}' by ${blog.author} added`)
+      blogFormRef.current.toggleVisibility()
+    } catch (error) {
       notify('creating a blog failed: ' + error.response.data.error, 'alert')
-    })
+    }
   }
 
   const removeBlog = (id) => {
@@ -72,14 +79,9 @@ const App = () => {
       `remove '${toRemove.title}' by ${toRemove.author}?`
     )
 
-    if (!ok) {
-      return
-    }
+    if (!ok) return
 
-    blogService.remove(id).then(() => {
-      /* const updatedBlogs = blogs.filter((b) => b.id !== id).sort(byLikes)
-      setBlogs(updatedBlogs) */
-    })
+    dispatch(deleteBlog(id))
   }
 
   const likeBlog = (id) => {
@@ -90,12 +92,8 @@ const App = () => {
       user: toLike.user.id,
     }
 
-    blogService.update(liked.id, liked).then((updatedBlog) => {
-      notify(`you liked '${updatedBlog.title}' by ${updatedBlog.author}`)
-      //const updatedBlogs = blogs.map((b) => (b.id === id ? updatedBlog : b))
-      //.sort(byLikes)
-      //setBlogs(updatedBlogs)
-    })
+    dispatch(incrementLikes({ blogId: liked.id, likedBlog: liked }))
+    notify(`you liked '${toLike.title}' by ${toLike.author}`)
   }
 
   const notify = (message, type = 'info') => {
@@ -117,18 +115,14 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-
       <Notification />
-
       <div>
         {user.name} logged in
         <button onClick={logout}>logout</button>
       </div>
-
       <Togglable buttonLabel="new note" ref={blogFormRef}>
         <NewBlogForm onCreate={createBlog} />
       </Togglable>
-
       <div id="blogs">
         {blogs.map((blog) => (
           <Blog
