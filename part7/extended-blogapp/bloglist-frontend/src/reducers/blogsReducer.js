@@ -47,8 +47,3 @@ const blogsReducer = createSlice({
 })
 
 export default blogsReducer.reducer
-
-export const getAllBlogs = (state) => [...state.blogs].sort(byLikes)
-
-/* export const selectBlogById = (state, blogId) =>
-  state.blogs.find((blog) => blog.id === blogId) */

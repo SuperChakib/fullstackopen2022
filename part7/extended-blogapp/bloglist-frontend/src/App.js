@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Blog from './components/Blog'
@@ -6,59 +6,42 @@ import LoginForm from './components/LoginForm'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+
 import {
   addNewBlog,
   deleteBlog,
   fetchBlogs,
-  getAllBlogs,
   incrementLikes,
 } from './reducers/blogsReducer'
 import {
   addNotification,
   removeNotification,
 } from './reducers/notificationReducer'
-
-import loginService from './services/login'
-import userService from './services/user'
+import { fetchUserLocally, loginUser, logoutUser } from './reducers/userReducer'
 
 const App = () => {
   const dispatch = useDispatch()
-
-  const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
   useEffect(() => {
     dispatch(fetchBlogs())
+    dispatch(fetchUserLocally())
   }, [])
 
-  const blogs = useSelector(getAllBlogs)
+  useEffect(() => {}, [])
 
-  useEffect(() => {
-    const userFromStorage = userService.getUser()
-    if (userFromStorage) {
-      setUser(userFromStorage)
-    }
-  }, [])
+  const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
 
   const login = (username, password) => {
-    loginService
-      .login({
-        username,
-        password,
-      })
-      .then((user) => {
-        setUser(user)
-        userService.setUser(user)
-        notify(`${user.name} logged in!`)
-      })
-      .catch(() => {
-        notify('wrong username/password', 'alert')
-      })
+    dispatch(loginUser({ username, password })).then((action) => {
+      if (!action.payload) notify('wrong username/password', 'alert')
+      else notify(`${action.payload.name} logged in!`)
+    })
   }
 
   const logout = () => {
-    setUser(null)
-    userService.clearUser()
+    dispatch(logoutUser())
     notify('good bye!')
   }
 
