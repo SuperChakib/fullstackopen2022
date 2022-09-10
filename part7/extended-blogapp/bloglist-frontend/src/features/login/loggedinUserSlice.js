@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
-import userService from '../services/user'
-import loginService from '../services/login'
+import userService from '../../services/user'
+import loginService from '../../services/login'
 
 export const loginUser = createAsyncThunk(
   'loggedinUser/loginUser',
