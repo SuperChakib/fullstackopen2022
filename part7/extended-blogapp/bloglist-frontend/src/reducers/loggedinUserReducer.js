@@ -4,7 +4,7 @@ import userService from '../services/user'
 import loginService from '../services/login'
 
 export const loginUser = createAsyncThunk(
-  'user/loginUser',
+  'loggedinUser/loginUser',
   async ({ username, password }) => {
     const user = await loginService.login({ username, password })
     userService.setUser(user)
@@ -12,12 +12,12 @@ export const loginUser = createAsyncThunk(
   }
 )
 
-export const logoutUser = createAsyncThunk('user/logoutUser', () => {
+export const logoutUser = createAsyncThunk('loggedinUser/logoutUser', () => {
   userService.clearUser()
 })
 
-const userReducer = createSlice({
-  name: 'user',
+const loggedinUserReducer = createSlice({
+  name: 'loggedinUser',
   initialState: null,
   reducers: {
     fetchUserLocally() {
@@ -35,6 +35,6 @@ const userReducer = createSlice({
   },
 })
 
-export const { fetchUserLocally } = userReducer.actions
+export const { fetchUserLocally } = loggedinUserReducer.actions
 
-export default userReducer.reducer
+export default loggedinUserReducer.reducer

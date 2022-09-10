@@ -1,6 +1,19 @@
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
+import {
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  TableHead,
+} from '@mui/material'
+
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import NewBlogForm from './components/NewBlogForm'
@@ -17,7 +30,12 @@ import {
   addNotification,
   removeNotification,
 } from './reducers/notificationReducer'
-import { fetchUserLocally, loginUser, logoutUser } from './reducers/userReducer'
+import {
+  fetchUserLocally,
+  loginUser,
+  logoutUser,
+} from './reducers/loggedinUserReducer'
+import { fetchAllUsers } from './reducers/usersSlice'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -26,12 +44,12 @@ const App = () => {
   useEffect(() => {
     dispatch(fetchBlogs())
     dispatch(fetchUserLocally())
+    dispatch(fetchAllUsers())
   }, [])
 
-  useEffect(() => {}, [])
-
   const blogs = useSelector((state) => state.blogs)
-  const user = useSelector((state) => state.user)
+  const loggedinUser = useSelector((state) => state.loggedinUser)
+  const users = useSelector((state) => state.users)
 
   const login = (username, password) => {
     dispatch(loginUser({ username, password })).then((action) => {
@@ -86,7 +104,7 @@ const App = () => {
     }, 5000)
   }
 
-  if (user === null) {
+  if (loggedinUser === null) {
     return (
       <>
         <Notification />
@@ -96,28 +114,69 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification />
-      <div>
-        {user.name} logged in
-        <button onClick={logout}>logout</button>
-      </div>
-      <Togglable buttonLabel="new note" ref={blogFormRef}>
-        <NewBlogForm onCreate={createBlog} />
-      </Togglable>
-      <div id="blogs">
-        {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={likeBlog}
-            removeBlog={removeBlog}
-            user={user}
-          />
-        ))}
-      </div>
-    </div>
+    <Container>
+      <Router>
+        <div>
+          <h2>blogs</h2>
+          <Notification />
+          <div>
+            {loggedinUser.name} logged in
+            <button onClick={logout}>logout</button>
+          </div>
+          <Routes>
+            <Route
+              path="/users"
+              element={
+                <>
+                  <h2>Users</h2>
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell></TableCell>
+                          <TableCell>
+                            <b>blogs created</b>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {users.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{user.blogs.length}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </>
+              }
+            />
+            <Route
+              path="/"
+              element={
+                <>
+                  <Togglable buttonLabel="new note" ref={blogFormRef}>
+                    <NewBlogForm onCreate={createBlog} />
+                  </Togglable>
+                  <div id="blogs">
+                    {blogs.map((blog) => (
+                      <Blog
+                        key={blog.id}
+                        blog={blog}
+                        likeBlog={likeBlog}
+                        removeBlog={removeBlog}
+                        user={loggedinUser}
+                      />
+                    ))}
+                  </div>
+                </>
+              }
+            />
+          </Routes>
+        </div>
+      </Router>
+    </Container>
   )
 }
 
