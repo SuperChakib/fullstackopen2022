@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
+import Navbar from './components/Navbar'
 import Notification from './features/notifications/Notification'
 import LoginForm from './features/login/LoginForm'
 import BlogsList from './features/blogs/BlogsList'
@@ -18,12 +19,16 @@ import {
   loginUser,
   logoutUser,
 } from './features/login/loggedinUserSlice'
+import { fetchAllBlogs } from './features/blogs/blogsSlice'
+import { fetchAllUsers } from './features/users/usersSlice'
 
 const App = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(fetchUserLocally())
+    dispatch(fetchAllBlogs())
+    dispatch(fetchAllUsers())
   }, [])
 
   const loggedinUser = useSelector((state) => state.loggedinUser)
@@ -58,12 +63,8 @@ const App = () => {
 
   return (
     <Router>
-      <h2>blogs</h2>
+      <Navbar loggedinUser={loggedinUser} logout={logout} />
       <Notification />
-      <div>
-        <p>{loggedinUser.name} logged in</p>
-        <button onClick={logout}>logout</button>
-      </div>
       <Routes>
         <Route
           path="/"

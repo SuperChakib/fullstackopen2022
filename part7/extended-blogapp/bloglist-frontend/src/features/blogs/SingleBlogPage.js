@@ -5,9 +5,6 @@ import { useDispatch } from 'react-redux'
 import { deleteBlog, incrementLikes } from './blogsSlice'
 
 const SingleBlogPage = ({ notify, user }) => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-
   const { blogId } = useParams()
 
   const blog = useSelector((state) =>
@@ -15,6 +12,9 @@ const SingleBlogPage = ({ notify, user }) => {
   )
 
   if (!blog) return null
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const removeBlog = () => {
     const ok = window.confirm(`remove '${blog.title}' by ${blog.author}?`)
@@ -44,7 +44,8 @@ const SingleBlogPage = ({ notify, user }) => {
       <h2>{blog.title}</h2>
       <a href={blog.url}>{blog.url}</a>
       <p>
-        {`${blog.likes} likes`} <button onClick={likeBlog}>like</button>
+        {`${blog.likes === 1 ? '1 like' : `${blog.likes} likes`}`}{' '}
+        <button onClick={likeBlog}>like</button>
       </p>
       <p>added by {addedBy}</p>
       {own && <button onClick={removeBlog}>remove</button>}

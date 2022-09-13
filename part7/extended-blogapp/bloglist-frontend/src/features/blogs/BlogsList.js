@@ -1,18 +1,14 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import NewBlogForm from './NewBlogForm'
 import Togglable from './Togglable'
 
-import { addNewBlog, fetchAllBlogs } from './blogsSlice'
+import { addNewBlog } from './blogsSlice'
 
 const BlogsList = ({ notify }) => {
   const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(fetchAllBlogs())
-  }, [])
 
   const blogFormRef = useRef()
 
@@ -37,6 +33,7 @@ const BlogsList = ({ notify }) => {
 
   return (
     <>
+      <h2>blog app</h2>
       <Togglable buttonLabel="create new" ref={blogFormRef}>
         <NewBlogForm onCreate={createBlog} />
       </Togglable>
