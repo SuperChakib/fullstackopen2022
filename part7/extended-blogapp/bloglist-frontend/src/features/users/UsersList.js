@@ -1,4 +1,7 @@
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import {
   Container,
@@ -10,10 +13,14 @@ import {
   Paper,
   TableHead,
 } from '@mui/material'
-
-import { Link } from 'react-router-dom'
+import { fetchAllUsers } from './usersSlice'
 
 const UsersList = () => {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchAllUsers())
+  }, [])
+
   const users = useSelector((state) => state.users)
 
   return (

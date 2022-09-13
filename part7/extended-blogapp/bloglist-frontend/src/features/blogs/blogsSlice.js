@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import blogService from '../../services/blogs'
 
-export const fetchBlogs = createAsyncThunk(
-  'blogs/fetchBlogs',
+export const fetchAllBlogs = createAsyncThunk(
+  'blogs/fetchAllBlogs',
   async () => await blogService.getAll()
 )
 
@@ -29,7 +29,7 @@ const blogsReducer = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(fetchBlogs.fulfilled, (state, action) => {
+      .addCase(fetchAllBlogs.fulfilled, (state, action) => {
         return action.payload.sort(byLikes)
       })
       .addCase(addNewBlog.fulfilled, (state, action) => {

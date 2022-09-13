@@ -1,14 +1,24 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Blog from './Blog'
 import NewBlogForm from './NewBlogForm'
 import Togglable from './Togglable'
 
-import { addNewBlog, deleteBlog, incrementLikes } from './blogsSlice'
+import {
+  addNewBlog,
+  deleteBlog,
+  fetchAllBlogs,
+  incrementLikes,
+} from './blogsSlice'
 
 const BlogsList = ({ notify, loggedinUser }) => {
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(fetchAllBlogs())
+  }, [])
+
   const blogFormRef = useRef()
 
   const blogs = useSelector((state) => state.blogs)

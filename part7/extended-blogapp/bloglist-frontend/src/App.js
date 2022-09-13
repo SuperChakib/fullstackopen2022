@@ -2,10 +2,11 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
-import LoginForm from './features/login/LoginForm'
 import Notification from './features/notifications/Notification'
-import UsersList from './features/users/UsersList'
+import LoginForm from './features/login/LoginForm'
 import BlogsList from './features/blogs/BlogsList'
+import SingleBlogPage from './features/blogs/SingleBlogPage'
+import UsersList from './features/users/UsersList'
 import SingleUserPage from './features/users/SingleUserPage'
 
 import {
@@ -17,16 +18,12 @@ import {
   loginUser,
   logoutUser,
 } from './features/login/loggedinUserSlice'
-import { fetchBlogs } from './features/blogs/blogsSlice'
-import { fetchAllUsers } from './features/users/usersSlice'
 
 const App = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(fetchUserLocally())
-    dispatch(fetchBlogs())
-    dispatch(fetchAllUsers())
   }, [])
 
   const loggedinUser = useSelector((state) => state.loggedinUser)
@@ -72,8 +69,13 @@ const App = () => {
           path="/"
           element={<BlogsList loggedinUser={loggedinUser} notify={notify} />}
         />
+        <Route
+          path="blogs"
+          element={<BlogsList loggedinUser={loggedinUser} notify={notify} />}
+        />
+        <Route path="blogs/:blogId" element={<SingleBlogPage />} />
         <Route path="users" element={<UsersList />} />
-        <Route path="users/:userId" exact element={<SingleUserPage />} />
+        <Route path="users/:userId" element={<SingleUserPage />} />
       </Routes>
     </Router>
   )
