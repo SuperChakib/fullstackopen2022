@@ -61,7 +61,7 @@ const App = () => {
       <h2>blogs</h2>
       <Notification />
       <div>
-        {loggedinUser.name} logged in
+        <p>{loggedinUser.name} logged in</p>
         <button onClick={logout}>logout</button>
       </div>
       <Routes>
@@ -73,7 +73,10 @@ const App = () => {
           path="blogs"
           element={<BlogsList loggedinUser={loggedinUser} notify={notify} />}
         />
-        <Route path="blogs/:blogId" element={<SingleBlogPage />} />
+        <Route
+          path="blogs/:blogId"
+          element={<SingleBlogPage notify={notify} user={loggedinUser} />}
+        />
         <Route path="users" element={<UsersList />} />
         <Route path="users/:userId" element={<SingleUserPage />} />
       </Routes>

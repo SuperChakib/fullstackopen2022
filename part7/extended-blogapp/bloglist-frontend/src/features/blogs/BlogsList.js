@@ -1,18 +1,13 @@
 import { useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-import Blog from './Blog'
 import NewBlogForm from './NewBlogForm'
 import Togglable from './Togglable'
 
-import {
-  addNewBlog,
-  deleteBlog,
-  fetchAllBlogs,
-  incrementLikes,
-} from './blogsSlice'
+import { addNewBlog, fetchAllBlogs } from './blogsSlice'
 
-const BlogsList = ({ notify, loggedinUser }) => {
+const BlogsList = ({ notify }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -33,44 +28,25 @@ const BlogsList = ({ notify, loggedinUser }) => {
     }
   }
 
-  const removeBlog = (id) => {
-    const toRemove = blogs.find((b) => b.id === id)
-
-    const ok = window.confirm(
-      `remove '${toRemove.title}' by ${toRemove.author}?`
-    )
-
-    if (!ok) return
-
-    dispatch(deleteBlog(id))
-  }
-
-  const likeBlog = (id) => {
-    const toLike = blogs.find((b) => b.id === id)
-    const liked = {
-      ...toLike,
-      likes: (toLike.likes || 0) + 1,
-      user: toLike.user.id,
-    }
-
-    dispatch(incrementLikes({ blogId: liked.id, likedBlog: liked }))
-    notify(`you liked '${toLike.title}' by ${toLike.author}`)
+  const style = {
+    padding: 3,
+    margin: 5,
+    borderStyle: 'solid',
+    borderWidth: 1,
   }
 
   return (
     <>
-      <Togglable buttonLabel="new note" ref={blogFormRef}>
+      <Togglable buttonLabel="create new" ref={blogFormRef}>
         <NewBlogForm onCreate={createBlog} />
       </Togglable>
       <div id="blogs">
         {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={likeBlog}
-            removeBlog={removeBlog}
-            user={loggedinUser}
-          />
+          <div key={blog.id} style={style} className="blog">
+            <Link to={`/blogs/${blog.id}`}>
+              {blog.title} {blog.author}
+            </Link>
+          </div>
         ))}
       </div>
     </>

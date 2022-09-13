@@ -40,7 +40,7 @@ const UsersList = () => {
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
-                  <Link to={`${user.id}`}>{user.name}</Link>
+                  <Link to={user.id}>{user.name}</Link>
                 </TableCell>
                 <TableCell>{user.blogs.length}</TableCell>
               </TableRow>
