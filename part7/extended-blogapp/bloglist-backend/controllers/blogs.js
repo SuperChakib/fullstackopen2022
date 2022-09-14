@@ -3,9 +3,15 @@ const router = require('express').Router()
 const Blog = require('../models/blog')
 
 router.get('/', async (request, response) => {
-  const notes = await Blog.find({}).populate('user', { username: 1, name: 1 })
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
 
-  response.json(notes)
+  response.json(blogs)
+})
+
+router.get('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+
+  response.json(blog)
 })
 
 router.post('/', async (request, response) => {
@@ -60,6 +66,20 @@ router.put('/:id', async (request, response) => {
   }).populate('user', { username: 1, name: 1 })
 
   response.json(updatedBlog)
+})
+
+router.post('/:id/comments', async (request, response) => {
+  const commentedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    { comments: request.body.comments },
+    {
+      new: true,
+      runValidators: true,
+      context: 'query',
+    }
+  )
+
+  response.json(commentedBlog)
 })
 
 module.exports = router

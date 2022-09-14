@@ -49,6 +49,18 @@ const SingleBlogPage = ({ notify, user }) => {
       </p>
       <p>added by {addedBy}</p>
       {own && <button onClick={removeBlog}>remove</button>}
+      <h3>comments</h3>
+      {blog.comments.length ? (
+        <div id="comments">
+          <ul>
+            {blog.comments.map((comment) => (
+              <li key={comment}>{comment}</li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p>no comments yet...</p>
+      )}
     </div>
   )
 }
