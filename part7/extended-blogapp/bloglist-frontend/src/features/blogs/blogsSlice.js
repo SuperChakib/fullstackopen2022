@@ -16,6 +16,11 @@ export const incrementLikes = createAsyncThunk(
   async ({ blogId, likedBlog }) => await blogService.update(blogId, likedBlog)
 )
 
+export const pushNewComment = createAsyncThunk(
+  'blogs/pushNewComment',
+  async ({ blogId, comments }) => await blogService.comment(blogId, comments)
+)
+
 export const deleteBlog = createAsyncThunk(
   'blogs/deleteBlog',
   async (blogId) => await blogService.remove(blogId)
@@ -29,7 +34,7 @@ const blogsReducer = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(fetchAllBlogs.fulfilled, (state, action) => {
+      .addCase(fetchAllBlogs.fulfilled, (_, action) => {
         return action.payload.sort(byLikes)
       })
       .addCase(addNewBlog.fulfilled, (state, action) => {
@@ -42,6 +47,11 @@ const blogsReducer = createSlice({
       })
       .addCase(deleteBlog.fulfilled, (state, action) => {
         return state.filter((blog) => blog.id !== action.payload)
+      })
+      .addCase(pushNewComment.fulfilled, (state, action) => {
+        return state.map((blog) =>
+          blog.id === action.payload.id ? action.payload : blog
+        )
       })
   },
 })

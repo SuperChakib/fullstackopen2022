@@ -69,15 +69,17 @@ router.put('/:id', async (request, response) => {
 })
 
 router.post('/:id/comments', async (request, response) => {
+  const comments = request.body.comments
+
   const commentedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    { comments: request.body.comments },
+    { comments },
     {
       new: true,
       runValidators: true,
       context: 'query',
     }
-  )
+  ).populate('user', { username: 1, name: 1 })
 
   response.json(commentedBlog)
 })
